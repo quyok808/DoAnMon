@@ -1,0 +1,56 @@
+﻿@page
+@model DoAnMon.Areas.Identity.Pages.Account.IndexModel
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width , initial-scale=1.0">
+    <link rel="stylesheet" href="/style.css" type="text/css">
+</head>
+<body>
+    <div class="container" id="container">
+        <div class="form-container sign-up">
+            <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+                <h1>Tạo tài khoản</h1>
+                <input asp-for="Input.Email" type="email" placeholder="Email">
+                <input asp-for="Input.Password" type="text" placeholder="Password">
+                <input asp-for="Input.ConfirmPassword" type="password" placeholder="Password">
+                <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary">Đăng Kí</button>
+            </form>
+        </div>
+
+        <div class="form-container sign-in">
+            <form id="account" method="post" asp-page="./Login" asp-page-handler="Login">
+                <h1>Đăng Nhập</h1>
+                <input asp-for="Input.Email" type="email" placeholder="Email">
+                <input asp-for="Input.Password" type="password" placeholder="Password">
+                <div class="checkbox mb-3">
+                    <label asp-for="Input.RememberMe" class="form-label">
+                        <input class="form-check-input" asp-for="Input.RememberMe" />
+                        @Html.DisplayNameFor(m => m.Input.RememberMe)
+                    </label>
+                </div>
+                <a id="forgot-password" asp-page="./ForgotPassword">Bạn đã quên mật khẩu của bạn ???</a>
+                <button id="login-submit" type="submit" class="w-100 btn btn-lg btn-primary">Đăng Nhập</button>
+            </form>
+        </div>
+        <div class="toggle-container">
+            <div class="toggle">
+                <div class="toggle-panel toggle-left">
+                    <h1>Đã có tài khoản</h1>
+                    <p>Vui lòng đăng nhập vào tài khoản của bạn!!!</p>
+                    <button class="hidden" id="login">Đăng Nhập</button>
+                </div>
+                <div class="toggle-panel toggle-right">
+                    <h1>Chào bạn!</h1>
+                    <p>Nếu chưa có tài khoản bạn hãy đăng kí để sử dụng các tính năng của chúng mình nhé!</p>
+                    <button class="hidden" id="register">Đăng Kí</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/script.js"></script>
+</body>
+</html>
