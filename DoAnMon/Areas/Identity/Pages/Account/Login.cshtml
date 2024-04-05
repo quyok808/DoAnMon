@@ -80,4 +80,17 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+
 }
+@if (!string.IsNullOrEmpty(Model.ErrorMessage))
+{
+    <script>
+        window.onload = function () {
+            alert("@Html.Raw(Model.ErrorMessage)");
+        }
+    </script>
+}
+
+
+
+

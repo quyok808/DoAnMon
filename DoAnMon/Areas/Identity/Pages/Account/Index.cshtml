@@ -14,7 +14,7 @@
             <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
                 <h1>Tạo tài khoản</h1>
                 <input asp-for="Input.Email" type="email" placeholder="Email">
-                <input asp-for="Input.Password" type="text" placeholder="Password">
+                <input asp-for="Input.Password" type="password" placeholder="Password">
                 <input asp-for="Input.ConfirmPassword" type="password" placeholder="Password">
                 <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary">Đăng Kí</button>
             </form>
@@ -52,5 +52,14 @@
     </div>
 
     <script src="/script.js"></script>
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <script>
+            window.onload = function () {
+                alert("@Html.Raw(Model.ErrorMessage)");
+            }
+        </script>
+    }
+
 </body>
 </html>

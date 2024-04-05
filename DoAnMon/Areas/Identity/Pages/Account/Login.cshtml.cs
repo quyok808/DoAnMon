@@ -21,11 +21,13 @@ namespace DoAnMon.Areas.Identity.Pages.Account
     {
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly ILogger<LoginModel> _logger;
+        private readonly UserManager<IdentityUser> _userManager;
 
-        public LoginModel(SignInManager<IdentityUser> signInManager, ILogger<LoginModel> logger)
+        public LoginModel(SignInManager<IdentityUser> signInManager, ILogger<LoginModel> logger, UserManager<IdentityUser> userManager)
         {
             _signInManager = signInManager;
             _logger = logger;
+            _userManager = userManager;
         }
 
         /// <summary>
@@ -82,6 +84,8 @@ namespace DoAnMon.Areas.Identity.Pages.Account
             /// </summary>
             [Display(Name = "Remember me?")]
             public bool RememberMe { get; set; }
+
+            public string ErrorMessage;
         }
 
         public async Task OnGetAsync(string returnUrl = null)
@@ -100,7 +104,7 @@ namespace DoAnMon.Areas.Identity.Pages.Account
 
             ReturnUrl = returnUrl;
         }
-
+        
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
         {
             returnUrl ??= Url.Content("~/");
@@ -129,7 +133,21 @@ namespace DoAnMon.Areas.Identity.Pages.Account
                 else
                 {
                     ModelState.AddModelError(string.Empty, "Invalid login attempt.");
-                    return Page();
+                    var mdUser = await _userManager.FindByEmailAsync(Input.Email);
+                    if (mdUser != null)
+                    {
+                        if (!mdUser.EmailConfirmed)
+                        {
+                            await _signInManager.SignOutAsync();
+                            return RedirectToPage("RegisterConfirmation", new { email = Input.Email, returnUrl = returnUrl });
+                        }
+                    }
+                    
+                    else
+                    {
+                        ErrorMessage = "Người dùng không tồn tại.";
+                        return RedirectToPage("./Index");
+                    }
                 }
             }
 

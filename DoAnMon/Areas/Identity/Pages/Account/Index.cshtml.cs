@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Authentication;
+﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -7,6 +7,9 @@ using System.ComponentModel.DataAnnotations;
 using System.Text.Encodings.Web;
 using System.Text;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
+using System.Net.Mail;
+using System.Net;
 
 namespace DoAnMon.Areas.Identity.Pages.Account
 {
@@ -130,10 +133,11 @@ namespace DoAnMon.Areas.Identity.Pages.Account
                         values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
                         protocol: Request.Scheme);
 
-                    await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
-                        $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+					await SendEmailAsync(Input.Email, "Confirm your email",
+						$"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
 
-                    if (_userManager.Options.SignIn.RequireConfirmedAccount)
+
+					if (_userManager.Options.SignIn.RequireConfirmedAccount)
                     {
                         return RedirectToPage("RegisterConfirmation", new { email = Input.Email, returnUrl = returnUrl });
                     }
@@ -153,7 +157,32 @@ namespace DoAnMon.Areas.Identity.Pages.Account
             return Page();
         }
 
-        private IdentityUser CreateUser()
+		private async Task<bool> SendEmailAsync(string email, string subject, string confirmLink)
+		{
+			try
+			{
+				MailMessage message = new MailMessage("quyok8080@gmail.com", email, subject, confirmLink);
+				message.IsBodyHtml = true;
+				SmtpClient smtpClient = new SmtpClient();
+				message.Body = confirmLink;
+
+				smtpClient.Port = 587;
+				smtpClient.Host = "smtp.gmail.com";
+
+
+				smtpClient.EnableSsl = true;
+				smtpClient.UseDefaultCredentials = false;
+				smtpClient.Credentials = new NetworkCredential("quyok8080@gmail.com", "uaab ylsf uikl mnnd"/*password của phần bảo mật khác*/);
+				smtpClient.Send(message);
+				return true;
+			}
+			catch (Exception)
+			{
+				return false;
+			}
+		}
+
+		private IdentityUser CreateUser()
         {
             try
             {
@@ -176,59 +205,68 @@ namespace DoAnMon.Areas.Identity.Pages.Account
             return (IUserEmailStore<IdentityUser>)_userStore;
         }
 
-        //login
+     //   //login
 
-        public async Task OnGetLoginAsync(string returnUrl = null)
-        {
-            if (!string.IsNullOrEmpty(ErrorMessage))
-            {
-                ModelState.AddModelError(string.Empty, ErrorMessage);
-            }
+     //   public async Task OnGetLoginAsync(string returnUrl = null)
+     //   {
+     //       if (!string.IsNullOrEmpty(ErrorMessage))
+     //       {
+     //           ModelState.AddModelError(string.Empty, ErrorMessage);
+     //       }
 
-            returnUrl ??= Url.Content("~/");
+     //       returnUrl ??= Url.Content("~/");
 
-            // Clear the existing external cookie to ensure a clean login process
-            await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
+     //       // Clear the existing external cookie to ensure a clean login process
+     //       await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
 
-            ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+     //       ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
 
-            ReturnUrl = returnUrl;
-        }
+     //       ReturnUrl = returnUrl;
+     //   }
 
-        public async Task<IActionResult> OnPostLoginAsync(string returnUrl = null)
-        {
-            returnUrl ??= Url.Content("~/");
+     //   public async Task<IActionResult> OnPostLoginAsync(string returnUrl = null)
+     //   {
+     //       returnUrl ??= Url.Content("~/");
 
-            ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+     //       ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
 
-            if (ModelState.IsValid)
-            {
-                // This doesn't count login failures towards account lockout
-                // To enable password failures to trigger account lockout, set lockoutOnFailure: true
-                var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
-                if (result.Succeeded)
-                {
-                    _logger.LogInformation("User logged in.");
-                    return LocalRedirect(returnUrl);
-                }
-                if (result.RequiresTwoFactor)
-                {
-                    return RedirectToPage("./LoginWith2fa", new { ReturnUrl = returnUrl, RememberMe = Input.RememberMe });
-                }
-                if (result.IsLockedOut)
-                {
-                    _logger.LogWarning("User account locked out.");
-                    return RedirectToPage("./Lockout");
-                }
-                else
-                {
-                    ModelState.AddModelError(string.Empty, "Invalid login attempt.");
-                    return Page();
-                }
-            }
+     //       if (ModelState.IsValid)
+     //       {
+     //           // This doesn't count login failures towards account lockout
+     //           // To enable password failures to trigger account lockout, set lockoutOnFailure: true
+     //           var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
+     //           if (result.Succeeded)
+     //           {
+     //               var mdUser = await _userManager.FindByEmailAsync(Input.Email);
+     //               if (!mdUser.EmailConfirmed)
+     //               {
+     //                   await _signInManager.SignOutAsync();
+					//	return RedirectToPage("RegisterConfirmation", new { email = Input.Email, returnUrl = returnUrl });
+					//}
+     //               else
+     //               {
+     //                   _logger.LogInformation("User logged in.");
+     //                   return LocalRedirect(returnUrl);
+     //               }
+     //           }
+     //           if (result.RequiresTwoFactor)
+     //           {
+     //               return RedirectToPage("./LoginWith2fa", new { ReturnUrl = returnUrl, RememberMe = Input.RememberMe });
+     //           }
+     //           if (result.IsLockedOut)
+     //           {
+     //               _logger.LogWarning("User account locked out.");
+     //               return RedirectToPage("./Lockout");
+     //           }
+     //           else
+     //           {
+     //               ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+     //               return RedirectToPage("/Index");
+     //           }
+     //       }
 
-            // If we got this far, something failed, redisplay form
-            return Page();
-        }
+     //       // If we got this far, something failed, redisplay form
+     //       return Page();
+     //   }
     }
 }
