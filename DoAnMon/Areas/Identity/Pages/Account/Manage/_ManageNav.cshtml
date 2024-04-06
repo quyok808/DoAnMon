@@ -1,0 +1,72 @@
+﻿@using DoAnMon.IdentityCudtomUser
+@inject SignInManager<CustomUser> SignInManager
+@{
+    var hasExternalLogins = (await SignInManager.GetExternalAuthenticationSchemesAsync()).Any();
+}
+<style>
+    .sidebar {
+        width: 250px;
+        background-color: #f8f9fa;
+    }
+
+    .nav-item {
+        margin-bottom: 10px;
+    }
+
+    .nav-link {
+        color: #333;
+        transition: all 0.3s ease;
+    }
+
+        .nav-link:hover {
+            color: #007bff;
+        }
+
+    .fa {
+        margin-right: 10px;
+    }
+
+</style>
+<div class="sidebar">
+    <ul class="nav flex-column">
+        <li class="nav-item">
+            <a class="nav-link @ManageNavPages.IndexNavClass(ViewContext)" asp-page="./Index">
+                <i class="fas fa-user"></i>
+                Profile
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link @ManageNavPages.EmailNavClass(ViewContext)" asp-page="./Email">
+                <i class="fas fa-envelope"></i>
+                Email
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link @ManageNavPages.ChangePasswordNavClass(ViewContext)" asp-page="./ChangePassword">
+                <i class="fas fa-key"></i>
+                Password
+            </a>
+        </li>
+        @if (hasExternalLogins)
+        {
+            <li class="nav-item">
+                <a class="nav-link @ManageNavPages.ExternalLoginsNavClass(ViewContext)" asp-page="./ExternalLogins">
+                    <i class="fas fa-external-link-alt"></i>
+                    External Logins
+                </a>
+            </li>
+        }
+        <li class="nav-item">
+            <a class="nav-link @ManageNavPages.TwoFactorAuthenticationNavClass(ViewContext)" asp-page="./TwoFactorAuthentication">
+                <i class="fas fa-shield-alt"></i>
+                Two-factor Authentication
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link @ManageNavPages.PersonalDataNavClass(ViewContext)" asp-page="./PersonalData">
+                <i class="fas fa-user-cog"></i>
+                Personal Data
+            </a>
+        </li>
+    </ul>
+</div>
