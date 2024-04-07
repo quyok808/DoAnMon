@@ -155,7 +155,7 @@ namespace DoAnMon.Areas.Identity.Pages.Account
                         $"<br>Password: {Input.Password}");
 
 
-					if (_userManager.Options.SignIn.RequireConfirmedAccount)
+                    if (_userManager.Options.SignIn.RequireConfirmedAccount)
                     {
                         return RedirectToPage("RegisterConfirmation", new { email = Input.Email, returnUrl = returnUrl });
                     }
@@ -168,6 +168,8 @@ namespace DoAnMon.Areas.Identity.Pages.Account
                 foreach (var error in result.Errors)
                 {
                     ModelState.AddModelError(string.Empty, error.Description);
+                    ErrorMessage = "Tài khoản đã tồn tại !!!";
+                    return RedirectToPage("./Index");
                 }
             }
 
@@ -175,32 +177,7 @@ namespace DoAnMon.Areas.Identity.Pages.Account
             return Page();
         }
 
-		//private async Task<bool> SendEmailAsync(string email, string subject, string confirmLink)
-		//{
-		//	try
-		//	{
-		//		MailMessage message = new MailMessage("ONLYA@gmail.com", email, subject, confirmLink);
-		//		message.IsBodyHtml = true;
-		//		SmtpClient smtpClient = new SmtpClient();
-		//		message.Body = confirmLink;
-
-		//		smtpClient.Port = 587;
-		//		smtpClient.Host = "smtp.gmail.com";
-
-
-		//		smtpClient.EnableSsl = true;
-		//		smtpClient.UseDefaultCredentials = false;
-		//		smtpClient.Credentials = new NetworkCredential("quyok8080@gmail.com", "uaab ylsf uikl mnnd"/*password của phần bảo mật khác*/);
-		//		smtpClient.Send(message);
-		//		return true;
-		//	}
-		//	catch (Exception)
-		//	{
-		//		return false;
-		//	}
-		//}
-
-		private CustomUser CreateUser()
+        private CustomUser CreateUser()
         {
             try
             {
@@ -211,6 +188,7 @@ namespace DoAnMon.Areas.Identity.Pages.Account
                 throw new InvalidOperationException($"Can't create an instance of '{nameof(IdentityUser)}'. " +
                     $"Ensure that '{nameof(CustomUser)}' is not an abstract class and has a parameterless constructor, or alternatively " +
                     $"override the register page in /Areas/Identity/Pages/Account/Register.cshtml");
+                return null;
             }
         }
 
@@ -222,69 +200,5 @@ namespace DoAnMon.Areas.Identity.Pages.Account
             }
             return (IUserEmailStore<CustomUser>)_userStore;
         }
-
-     //   //login
-
-     //   public async Task OnGetLoginAsync(string returnUrl = null)
-     //   {
-     //       if (!string.IsNullOrEmpty(ErrorMessage))
-     //       {
-     //           ModelState.AddModelError(string.Empty, ErrorMessage);
-     //       }
-
-     //       returnUrl ??= Url.Content("~/");
-
-     //       // Clear the existing external cookie to ensure a clean login process
-     //       await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
-
-     //       ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
-
-     //       ReturnUrl = returnUrl;
-     //   }
-
-     //   public async Task<IActionResult> OnPostLoginAsync(string returnUrl = null)
-     //   {
-     //       returnUrl ??= Url.Content("~/");
-
-     //       ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
-
-     //       if (ModelState.IsValid)
-     //       {
-     //           // This doesn't count login failures towards account lockout
-     //           // To enable password failures to trigger account lockout, set lockoutOnFailure: true
-     //           var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
-     //           if (result.Succeeded)
-     //           {
-     //               var mdUser = await _userManager.FindByEmailAsync(Input.Email);
-     //               if (!mdUser.EmailConfirmed)
-     //               {
-     //                   await _signInManager.SignOutAsync();
-					//	return RedirectToPage("RegisterConfirmation", new { email = Input.Email, returnUrl = returnUrl });
-					//}
-     //               else
-     //               {
-     //                   _logger.LogInformation("User logged in.");
-     //                   return LocalRedirect(returnUrl);
-     //               }
-     //           }
-     //           if (result.RequiresTwoFactor)
-     //           {
-     //               return RedirectToPage("./LoginWith2fa", new { ReturnUrl = returnUrl, RememberMe = Input.RememberMe });
-     //           }
-     //           if (result.IsLockedOut)
-     //           {
-     //               _logger.LogWarning("User account locked out.");
-     //               return RedirectToPage("./Lockout");
-     //           }
-     //           else
-     //           {
-     //               ModelState.AddModelError(string.Empty, "Invalid login attempt.");
-     //               return RedirectToPage("/Index");
-     //           }
-     //       }
-
-     //       // If we got this far, something failed, redisplay form
-     //       return Page();
-     //   }
     }
 }
